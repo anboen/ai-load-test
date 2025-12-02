@@ -2,6 +2,7 @@ from pathlib import Path
 import argparse
 import pandas as pd
 import numpy as np
+import os
 
 
 def add_diff_time(df_current):
@@ -53,6 +54,10 @@ def clean_df(gpu, df):
 
 
 def main(base_path="./results/"):
+    file_path = Path(base_path) / "all_times.csv"
+    if file_path.exists():
+        os.remove(file_path)
+
     df = None
     for file in Path(base_path).glob("*.csv"):
         gpu = file.name.split('_')[1]
@@ -62,7 +67,7 @@ def main(base_path="./results/"):
             df = add_df(df, file, gpu)
     if df is None:
         raise ValueError("No data found in results folder.")
-    df.to_csv(f"{base_path}/all_times.csv", index=False, sep=';')
+    df.to_csv(file_path, index=False, sep=';')
 
 
 if __name__ == "__main__":
