@@ -19,6 +19,20 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/src" // Replace with your source folder path
             }
+        },
+        {
+            "name": "Debug Aggregate File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/aggregate.py",
+            "args": [
+                ".\\results\\300"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src" // Replace with your source folder path
+            }
         }
     ]
 }

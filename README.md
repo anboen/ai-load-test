@@ -1,45 +1,62 @@
-# vLLM OpenAI-style client
+# AI Load Test Toolkit
 
-This repository contains a small Python CLI that uses the official
-`openai` Python library pointed at a vLLM server's OpenAI-compatible API
-endpoint (via `api_base`). It's useful when your vLLM server implements
-the OpenAI chat completions API surface.
+This repository provides Python scripts for load testing AI model APIs, aggregating results, and visualizing performance. It is designed for vLLM servers and OpenAI-compatible endpoints.
 
-Files
+## Setup
 
-- `scripts/vllm_openai_client.py` — CLI that calls `openai.ChatCompletion.create`.
-- `requirements.txt` — minimal dependency list (`openai`).
+1. **Install dependencies**
+   ```powershell
+   python -m pip install -r requirements.txt
+   ```
+2. **Configure environment**
+   - Edit files in `envs/` to set API endpoints, keys, and other variables as needed.
 
-Quick start (PowerShell)
+---
 
-1. Install dependencies
+## How to Use the Scripts
 
-```powershell
-python -m pip install -r requirements.txt
-```
-
-2. Run a synchronous chat request
+### 1. Run Load Tests
+Use `scripts/text_load_test.py` to send prompts to your AI API and record response times.
 
 ```powershell
-python scripts/vllm_openai_client.py --api-base http://127.0.0.1:8000/v1 \
-  --model my-model --message "Write a two-line haiku about fog"
+python scripts/text_load_test.py --env envs/text_gpt.env --input inputs/texts/prompts.txt --output results/test_run.csv
 ```
+- `--env` specifies the environment file with API settings
+- `--input` is the file with prompts
+- `--output` is the CSV file to save results
 
-3. Run streaming (if server supports it)
+---
+
+### 2. Aggregate Results
+Use `scripts/aggregate.py` to combine multiple result CSVs into a summary file.
 
 ```powershell
-python scripts/vllm_openai_client.py --api-base http://127.0.0.1:8000/v1 \
-  --model my-model --message "Tell a short story" --stream
+python scripts/aggregate.py --base_path results/
 ```
+- Aggregates all CSVs in the specified folder
+- Produces `all_times.csv` with combined data
 
-Environment
+---
 
-- Set `VLLM_API_BASE` to change the default base URL.
-- Provide an API key with `--api-key` or set `VLLM_API_KEY` / `OPENAI_API_KEY`.
+### 3. Plot Results
+Use `scripts/plot.py` to visualize aggregated results.
 
-Notes
+```powershell
+python scripts/plot.py --input results/all_times.csv --output results/plot.png
+```
+- `--input` is the aggregated CSV
+- `--output` is the image file for the plot
 
-- The script is best-effort for both streaming and non-streaming flows and
-  extracts assistant content from OpenAI-compatible responses. If your
-  vLLM server uses a different request/response shape, pass a different
-  `--api-base` or adjust the call in `scripts/vllm_openai_client.py`.
+---
+
+## Notes
+
+- Adjust environment files in `envs/` for different models or endpoints
+- Scripts are designed for OpenAI-compatible APIs but can be adapted for others
+- Aggregation and plotting scripts help analyze and visualize test results
+
+---
+
+## License
+
+See `LICENSE` for details.

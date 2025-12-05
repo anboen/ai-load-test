@@ -49,7 +49,7 @@ def sort_df(df):
 def clean_df(gpu, df):
     df['gpu'] = gpu
     df['response'] = None
-    # df.drop(df.tail(4).index, inplace=True)
+    df.drop(df.tail(50).index, inplace=True)
     return df
 
 
@@ -67,6 +67,8 @@ def main(base_path="./results/"):
             df = add_df(df, file, gpu)
     if df is None:
         raise ValueError("No data found in results folder.")
+    df.drop(df[df['gpu'] == 'RTX-PRO-6000-WK'].index, inplace=True)
+
     df.to_csv(file_path, index=False, sep=';')
 
 

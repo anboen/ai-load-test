@@ -115,9 +115,9 @@ class LoadTest (ABC):
                                                           self.logger, i)))
         for thread in threads:
             thread.start()
-        for i, thread in enumerate(threads):
+        """for i, thread in enumerate(threads):
             thread.join()
-            print(f'Thread {i}/{self.num_threads} has finished.')
+            print(f'Thread {i}/{self.num_threads} has finished.')"""
 
     def prepare(self):
         self.inputs = []
