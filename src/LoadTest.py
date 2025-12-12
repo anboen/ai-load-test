@@ -1,6 +1,7 @@
 import os
 import time
 import random
+import json
 
 from threading import Thread
 from pathlib import Path
@@ -115,9 +116,9 @@ class LoadTest (ABC):
                                                           self.logger, i)))
         for thread in threads:
             thread.start()
-        """for i, thread in enumerate(threads):
+        for i, thread in enumerate(threads):
             thread.join()
-            print(f'Thread {i}/{self.num_threads} has finished.')"""
+            print(f'Thread {i}/{self.num_threads} has finished.')
 
     def prepare(self):
         self.inputs = []
@@ -176,20 +177,32 @@ class TextLoadTest(LoadTest):
 class AudioLoadTest(LoadTest):
 
     def _call_server(self, request):
-        return self.client.audio.transcriptions.create(
+        response_str = self.client.audio.transcriptions.create(
             model=self.model,
             file=request["file"],
-            response_format="text"
-        ).text
+            response_format="text",
+            language="de"
+        )
+        json_response = json.loads(response_str)
+        return json_response["text"]
+
+    def _prepare_server(self):
+        print("Preparing server...")
+        start = time.time()
+        self._call_server(self.inputs[0])
+        print(f'Server prepared in {time.time() - start} seconds.')
 
     def prepare(self):
         self.inputs = []
         input_path_obj = Path(self.input_path)
-        files = input_path_obj.glob('*.mp3')
-        for file in files:
-            audio_file = open(str(file), "rb")
-            request = {
-                "file": audio_file,
-                "response_format": "text"
-            }
-            self.inputs.append(request)
+        for i in range(200):
+            files = input_path_obj.glob('*.*')
+            for file in files:
+                audio_file = open(str(file), "rb")
+                request = {
+                    "file": audio_file,
+                    "response_format": "text"
+                }
+                self.inputs.append(request)
+        print(f"Prepared {len(self.inputs)} audio inputs.")
+        self._prepare_server()
